@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // --- IMPORTS DE PROYECTO ---
 import 'firebase_options.dart';
@@ -18,6 +19,9 @@ import 'package:k_list/screens/detalle_actor.dart';
 import 'package:k_list/screens/zona_k_screen.dart';
 import 'screens/pantalla_juegos.dart';
 
+// --- WIDGETS ---
+import 'package:k_list/widgets/banner_klist.dart';
+
 // ==========================================
 // 🚀 PUNTO DE ENTRADA (MAIN)
 // ==========================================
@@ -27,6 +31,7 @@ Future<void> main() async {
   // Carga variables de entorno y Firebase antes de arrancar la UI
   await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  MobileAds.instance.initialize();
   
   runApp(const KListApp());
 }
@@ -253,7 +258,13 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
       ),
       
       extendBody: true,
-      bottomNavigationBar: _buildBottomBar(),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const BannerKList(), // 👈 ¡AQUÍ APARECE LA PUBLICIDAD! 💵
+          _buildBottomBar(),   // Tu barra de navegación original
+        ],
+      ),
       
       // Botón flotante solo visible en Inicio
       floatingActionButton: _indiceSeleccionado == 0 ? FloatingActionButton(

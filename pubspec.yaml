@@ -45,6 +45,7 @@ dependencies:
   google_sign_in: ^6.2.1     # Para la ventanita de "Entrar con Google"
   image_picker: ^1.0.4
   flutter_secure_storage: ^10.0.0
+  google_mobile_ads: ^7.0.0
 
 dev_dependencies:
   flutter_test:
