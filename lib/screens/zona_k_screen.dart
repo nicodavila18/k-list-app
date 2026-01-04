@@ -215,11 +215,14 @@ class _PantallaZonaKState extends State<PantallaZonaK> {
   }
 
   void _cerrarSesion() async {
-    // 1. Limpieza de credenciales
+    // 1. 👇 NUEVO: Borramos la memoria local del teléfono
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // ¡PUM! Borrón y cuenta nueva.
+
+    // 2. Borrar datos de Auth
     await _authService.logout();
     
     if (mounted) {
-      // 2. Navegación al Login (Eliminando historial)
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const LoginScreen()),
         (Route<dynamic> route) => false,

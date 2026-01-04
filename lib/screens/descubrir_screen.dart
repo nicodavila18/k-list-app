@@ -13,13 +13,15 @@ import 'package:k_list/screens/detalle_actor.dart';
 class PantallaDescubrir extends StatefulWidget {
   final Function(Serie) onSerieAgregada; 
   final Function(ActorFavorito) onActorAgregado;
-  final List<Serie> seriesGuardadas; 
+  final List<Serie> seriesGuardadas;
+  final List<ActorFavorito> actoresGuardados;
 
   const PantallaDescubrir({
     super.key, 
     required this.onSerieAgregada,
     required this.onActorAgregado,
     required this.seriesGuardadas,
+    required this.actoresGuardados,
   });
 
   @override
@@ -190,10 +192,16 @@ class _PantallaDescubrirState extends State<PantallaDescubrir> with SingleTicker
         // Configuración visual según tipo
         String subtitulo = "Desconocido";
         IconData iconoTipo = Icons.tv;
+
+        bool yaTengoActor = false;
+        bool yaTengoSerie = false;
+        Serie? serieExistente;
+        
         
         if (mediaType == 'person') {
           subtitulo = "Actor / Idol ⭐";
           iconoTipo = Icons.person;
+          yaTengoActor = widget.actoresGuardados.any((a) => a.tmdbId == json['id']);
         } else if (mediaType == 'movie') {
           subtitulo = "Película 🎬";
           iconoTipo = Icons.movie;
@@ -204,12 +212,10 @@ class _PantallaDescubrirState extends State<PantallaDescubrir> with SingleTicker
         }
 
         // ¿Ya la tengo guardada?
-        bool yaLaTengo = false;
-        Serie? serieExistente;
         if (mediaType != 'person') {
           try {
             serieExistente = widget.seriesGuardadas.firstWhere((s) => s.tmdbId == json['id']);
-            yaLaTengo = true;
+            yaTengoSerie = true;
           } catch (_) {}
         }
 
@@ -230,47 +236,97 @@ class _PantallaDescubrirState extends State<PantallaDescubrir> with SingleTicker
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(subtitulo, style: TextStyle(color: Colors.blueGrey[400])),
-                if (yaLaTengo) 
+                
+                // Etiquetas de "YA LO TIENES"
+                if (yaTengoSerie) 
                   Container(
                     margin: const EdgeInsets.only(top: 4),
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
                     child: const Text("EN TU LISTA", style: TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.bold)),
-                  )
+                  ),
+                if (yaTengoActor)
+                  Container(
+                    margin: const EdgeInsets.only(top: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+                    child: const Text("FAVORITO ❤️", style: TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.bold)),
+                  ),
               ],
             ),
             
-            // Acción al tocar la tarjeta (Ver Detalle)
+            // LÓGICA DEL CLIC
             onTap: () {
-               if (yaLaTengo && serieExistente != null) {
+               if (yaTengoSerie && serieExistente != null) {
                  Navigator.push(context, MaterialPageRoute(builder: (_) => PantallaDetalleSerie(serie: serieExistente!)));
                } 
                else if (mediaType == 'person') {
-                 Navigator.push(context, MaterialPageRoute(builder: (_) => PantallaDetalleActor(
-                   actorId: json['id'], nombre: titulo, fotoUrl: imagenUrl,
-                   seriesGuardadas: widget.seriesGuardadas, onSerieAgregada: widget.onSerieAgregada,
-                 )));
+                 if (yaTengoActor) {
+                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("¡Ya es tu favorito! ❤️"), backgroundColor: Colors.redAccent));
+                 } else {
+                   // Ir al detalle para agregar
+                   Navigator.push(context, MaterialPageRoute(builder: (_) => PantallaDetalleActor(
+                     actorId: json['id'], nombre: titulo, fotoUrl: imagenUrl,
+                     seriesGuardadas: widget.seriesGuardadas, onSerieAgregada: widget.onSerieAgregada,
+                   )));
+                 }
                } 
                else {
-                 // Previsualización de Serie Nueva
                  final tempSerie = _crearSerieTemporal(json, mediaType, titulo, imagenUrl);
                  Navigator.push(context, MaterialPageRoute(builder: (_) => PantallaDetalleSerie(serie: tempSerie)));
                }
             },
 
-            // Acción al tocar el botón (+ / Editar)
-            trailing: IconButton(
-              icon: Icon(yaLaTengo ? Icons.edit : Icons.add_circle, color: yaLaTengo ? Colors.blue : const Color(0xFFFFC107), size: 32),
-              onPressed: () {
-                if (yaLaTengo && serieExistente != null) {
-                   Navigator.push(context, MaterialPageRoute(builder: (_) => PantallaDetalleSerie(serie: serieExistente!)));
-                } else {
-                   _procesarAgregado(json, mediaType, titulo, imagenUrl);
-                }
-              },
+            // BOTÓN LATERAL (Aquí ponemos el corazón o el +)
+            trailing: _buildBotonAccion(
+              yaTengoSerie: yaTengoSerie, 
+              yaTengoActor: yaTengoActor, 
+              mediaType: mediaType,
+              json: json, titulo: titulo, imagenUrl: imagenUrl, serieExistente: serieExistente
             ),
           ),
         );
+      },
+    );
+  }
+
+  // WIDGET AUXILIAR PARA EL BOTÓN
+  Widget _buildBotonAccion({
+    required bool yaTengoSerie, 
+    required bool yaTengoActor, 
+    required String mediaType,
+    required dynamic json,
+    required String titulo,
+    required String imagenUrl,
+    Serie? serieExistente
+  }) {
+    // CASO 1: IDOL YA AGREGADO -> ❤️
+    if (mediaType == 'person' && yaTengoActor) {
+      return IconButton(
+        icon: const Icon(Icons.favorite, color: Colors.red, size: 32),
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("¡Ya lo tienes en tu corazón! ❤️")));
+        },
+      );
+    }
+
+    // CASO 2: SERIE YA AGREGADA -> Lápiz Azul ✏️
+    if (yaTengoSerie) {
+      return IconButton(
+        icon: const Icon(Icons.edit, color: Colors.blue, size: 32),
+        onPressed: () {
+          if (serieExistente != null) {
+             Navigator.push(context, MaterialPageRoute(builder: (_) => PantallaDetalleSerie(serie: serieExistente)));
+          }
+        },
+      );
+    }
+
+    // CASO 3: NO LO TENGO -> Botón Amarillo (+)
+    return IconButton(
+      icon: const Icon(Icons.add_circle, color: Color(0xFFFFC107), size: 32),
+      onPressed: () {
+        _procesarAgregado(json, mediaType, titulo, imagenUrl);
       },
     );
   }

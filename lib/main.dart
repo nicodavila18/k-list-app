@@ -240,7 +240,8 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
           ),
           // 1. BUSCADOR GLOBAL
           PantallaDescubrir(
-            seriesGuardadas: misSeries, 
+            seriesGuardadas: misSeries,
+            actoresGuardados: misActores,
             onSerieAgregada: _agregarSerie,
             onActorAgregado: _agregarActor, 
           ),

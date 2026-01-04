@@ -6,11 +6,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Modelos y Pantallas
 import '../models/serie.dart';
+import '../models/actor_favorito.dart';
 import 'detalle_serie.dart';
 import 'detalle_actor.dart';
 
 class PantallaBusqueda extends StatefulWidget {
-  const PantallaBusqueda({super.key});
+  final List<ActorFavorito> actoresGuardados;
+
+  const PantallaBusqueda({super.key, required this.actoresGuardados});
 
   @override
   State<PantallaBusqueda> createState() => _PantallaBusquedaState();
@@ -129,11 +132,12 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
     );
   }
 
+  // ==========================================
+  // 🎭 WIDGET DE ACTORES (MODIFICADO)
+  // ==========================================
   Widget _buildItemActor(dynamic item) {
     final profilePath = item['profile_path'];
     final nombre = item['name'] ?? 'Desconocido';
-    
-    // Intentamos buscar por qué es conocido (ej: "Squid Game")
     final conocidos = item['known_for'] as List<dynamic>?;
     String conocidoPor = "";
     if (conocidos != null && conocidos.isNotEmpty) {
@@ -141,30 +145,54 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
       conocidoPor = obra['title'] ?? obra['name'] ?? '';
     }
 
+    // 🆕 1. VERIFICAMOS SI YA LO TENEMOS
+    // Comparamos el ID de TMDB del resultado con los que tenemos guardados
+    bool yaLoTengo = widget.actoresGuardados.any((a) => a.tmdbId == item['id']);
+
     return ListTile(
       leading: CircleAvatar(
         radius: 24,
         backgroundImage: NetworkImage('https://image.tmdb.org/t/p/w200$profilePath'),
-        onBackgroundImageError: (_, __) {},
       ),
       title: Text(nombre, style: const TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(conocidoPor.isNotEmpty ? "Actor • $conocidoPor" : "Actor"),
-      trailing: const Icon(Icons.star, color: Color(0xFFFFC107), size: 18), // Estrella dorada
+      subtitle: yaLoTengo
+          ? const Text("¡Ya es tu favorito! ❤️", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 12))
+          : Text(conocidoPor.isNotEmpty ? "Actor • $conocidoPor" : "Actor"),
+      
+      // 🆕 2. VISUAL: Corazón Rojo vs Flecha/Estrella
+      trailing: yaLoTengo 
+        ? const Icon(Icons.favorite, color: Colors.red, size: 28) // ❤️ Lleno
+        : const Icon(Icons.star_border, color: Color(0xFFFFC107), size: 24), // ⭐ Borde (o lo que prefieras)
+      
       onTap: () {
-        // Navegamos al detalle del actor
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PantallaDetalleActor(
-              actorId: item['id'],
-              nombre: nombre,
-              fotoUrl: 'https://image.tmdb.org/t/p/w500$profilePath',
-              // NOTA: Si necesitas pasar listas vacías o callbacks, hazlo aquí
-              seriesGuardadas: const [], 
-              onSerieAgregada: (_) {}, 
+        if (yaLoTengo) {
+          // 🆕 3. SI YA LO TIENES: Avisar y no hacer nada (o lo que quieras)
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("¡Ya tienes a $nombre en tus favoritos!"), 
+              backgroundColor: Colors.redAccent,
+              duration: const Duration(seconds: 2),
+            )
+          );
+        } else {
+          // 🆕 4. SI NO LO TIENES: Ir al detalle para agregar
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PantallaDetalleActor(
+                actorId: item['id'],
+                nombre: nombre,
+                fotoUrl: 'https://image.tmdb.org/t/p/w500$profilePath',
+                // Pasamos listas vacías o lo que necesites, ya que aquí solo queremos agregar
+                seriesGuardadas: const [], 
+                onSerieAgregada: (_) {}, 
+              ),
             ),
-          ),
-        );
+          ).then((_) {
+             // Opcional: Podrías recargar si agregaste algo, pero requiere callbacks complejos.
+             // Por ahora está bien así.
+          });
+        }
       },
     );
   }
