@@ -60,23 +60,23 @@ Este proyecto simula un entorno de producción real, implementando una **Clean A
 Este proyecto requiere tanto el cliente Flutter como el servidor Python.
 
 ### 1. Clonar Repositorio
+
 ```bash
-git clone [https://github.com/nicodavila18/k-list-app.git](https://github.com/nicodavila18/k-list-app.git)
+git clone https://github.com/nicodavila18/k-list-app.git
 
-### 2. Configuración (Variables de Entorno)
-
+2. Configuración (Variables de Entorno)
 Crea un archivo .env en la raíz del proyecto Flutter:
 
-API_URL=[https://tu-backend-python.onrender.com](https://tu-backend-python.onrender.com)
+API_URL=https://tu-backend-python.onrender.com
 TMDB_KEY=tu_api_key_de_tmdb
 GOOGLE_CLIENT_ID=tu_cliente_id_google
 
-### 3. Ejecutar App
+3. Ejecutar App
 
 flutter pub get
 flutter run
 
-# Autor
+👤 Autor
 Nicolás Dávila
 
 Desarrollador Full Stack (Flutter & Python).
