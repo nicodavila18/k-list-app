@@ -365,12 +365,31 @@ class _ContenidoPrincipalState extends State<_ContenidoPrincipal> {
     }
   }
 
+  // 👇 Función para definir el ORDEN (Menor número = Más arriba)
+  int _obtenerPeso(String estado) {
+    switch (estado) {
+      case 'Viendo': return 1;      // Prioridad máxima
+      case 'Por ver': return 2;     // Al medio
+      case 'Terminada': return 3;   // Al fondo
+      case 'Abandonada': return 4;  // Lo último de lo último
+      default: return 5;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // 🔍 LÓGICA DE FILTRADO LOCAL
-    final seriesFiltradas = widget.listaSeries.where((s) => s.titulo.toLowerCase().contains(_filtro.toLowerCase())).toList();
-    final pelisFiltradas = widget.listaPeliculas.where((p) => p.titulo.toLowerCase().contains(_filtro.toLowerCase())).toList();
+    final seriesFiltradas = widget.listaSeries
+        .where((s) => s.titulo.toLowerCase().contains(_filtro.toLowerCase()))
+        .toList();
+    
+    final pelisFiltradas = widget.listaPeliculas
+        .where((p) => p.titulo.toLowerCase().contains(_filtro.toLowerCase()))
+        .toList();
     final actoresFiltrados = widget.actores.where((a) => a.nombre.toLowerCase().contains(_filtro.toLowerCase())).toList();
+
+    seriesFiltradas.sort((a, b) => _obtenerPeso(a.estado).compareTo(_obtenerPeso(b.estado)));
+    pelisFiltradas.sort((a, b) => _obtenerPeso(a.estado).compareTo(_obtenerPeso(b.estado)));
 
     return DefaultTabController(
       length: 3, 
