@@ -10,7 +10,7 @@ Este proyecto simula un entorno de producción real, implementando una **Clean A
 
 | Login | Inicio | Buscador | Detalle | Perfil |
 |:---:|:---:|:---:|:---:|:---:|
-| <img src="screenshots/Login.jpeg" width="200"/>| <img src="screenshots/Pagina_principal.jpeg" width="200"/> | <img src="screenshots/Buscador.jpeg" width="200"/> | <img src="screenshots/detalle_serie.jpeg" width="200"/> | <img src="screenshots/Mi_perfil.jpeg" width="200"/> |
+| <img src="screenshots/Login.jpeg" width="200"/>| <img src="screenshots/Pagina_principal.jpeg" width="200"/> | <img src="screenshots/Buscador.jpeg" width="200"/> | <img src="screenshots/Detalle_serie.jpeg" width="200"/> | <img src="screenshots/Mi_perfil.jpeg" width="200"/> |
 
 ---
 
