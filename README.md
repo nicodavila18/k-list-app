@@ -61,8 +61,7 @@ Este proyecto requiere tanto el cliente Flutter como el servidor Python.
 
 ### 1. Clonar Repositorio
 ```bash
-git clone [https://github.com/TU_USUARIO/k-list-app.git](https://github.com/TU_USUARIO/k-list-app.git)
-
+git clone [https://github.com/nicodavila18/k-list-app.git](https://github.com/nicodavila18/k-list-app.git)
 
 ### 2. Configuración (Variables de Entorno)
 
