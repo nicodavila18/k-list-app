@@ -450,7 +450,7 @@ class _ListaRecomendadaState extends State<_ListaRecomendada> {
     if (_series.isEmpty) return const Center(child: Text("No hay datos disponibles"));
 
     return GridView.builder(
-      padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 100),
+      padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 200),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2, childAspectRatio: 0.7, crossAxisSpacing: 16, mainAxisSpacing: 16,
       ),
