@@ -62,23 +62,32 @@ Este proyecto requiere tanto el cliente Flutter como el servidor Python.
 ### 1. Clonar Repositorio
 
 ```bash
-git clone https://github.com/nicodavila18/k-list-app.git
+git clone [https://github.com/nicodavila18/k-list-app.git](https://github.com/nicodavila18/k-list-app.git)
+```
 
-2. Configuración (Variables de Entorno)
-Crea un archivo .env en la raíz del proyecto Flutter:
+### 2. Configuración (Variables de Entorno)
 
-API_URL=https://tu-backend-python.onrender.com
+Crea un archivo `.env` en la raíz del proyecto Flutter:
+
+```env
+API_URL=[https://tu-backend-python.onrender.com](https://tu-backend-python.onrender.com)
 TMDB_KEY=tu_api_key_de_tmdb
 GOOGLE_CLIENT_ID=tu_cliente_id_google
+```
 
-3. Ejecutar App
+### 3. Ejecutar App
 
+```bash
 flutter pub get
 flutter run
+```
 
-👤 Autor
-Nicolás Dávila
+---
+
+## 👤 Autor
+
+**Nicolás Dávila**
 
 Desarrollador Full Stack (Flutter & Python).
 
-LinkedIn: https://www.linkedin.com/in/nicodavila18/
+[LinkedIn](https://www.linkedin.com/in/nicodavila18/)
