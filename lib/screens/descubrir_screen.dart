@@ -178,7 +178,7 @@ class _PantallaDescubrirState extends State<PantallaDescubrir> with SingleTicker
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 200),
       itemCount: _resultadosBusqueda.length,
       itemBuilder: (context, index) {
         final json = _resultadosBusqueda[index];

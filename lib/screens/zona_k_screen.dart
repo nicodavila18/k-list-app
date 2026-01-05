@@ -349,7 +349,7 @@ class _PantallaZonaKState extends State<PantallaZonaK> {
                       _OpcionPerfil(icon: Icons.notifications_active_rounded, text: "Notificaciones", onTap: _mostrarConfiguracion),
                       _OpcionPerfil(icon: Icons.logout_rounded, text: "Cerrar Sesión", esRojo: true, onTap: _cerrarSesion),
                       
-                      const SizedBox(height: 100),
+                      const SizedBox(height: 220),
                     ],
                   ),
                 ),

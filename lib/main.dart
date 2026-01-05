@@ -479,7 +479,7 @@ class _ContenidoPrincipalState extends State<_ContenidoPrincipal> {
     }
     
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 220),
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
@@ -529,7 +529,7 @@ class _ContenidoPrincipalState extends State<_ContenidoPrincipal> {
     }
     
     return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 160), 
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 220), 
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3, childAspectRatio: 0.7, crossAxisSpacing: 15, mainAxisSpacing: 15
       ),
