@@ -223,6 +223,18 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     );
   }
 
+  void _mostrarRecomendacionesIA(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0A1931),
+      isScrollControlled: true, // Para que el modal pueda ser más alto
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) => const ModalRecomendacionesIA(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Filtros rápidos para las pestañas
@@ -267,11 +279,28 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
       ),
       
       // Botón flotante solo visible en Inicio
-      floatingActionButton: _indiceSeleccionado == 0 ? FloatingActionButton(
-        backgroundColor: const Color(0xFFFFC107),
-        foregroundColor: const Color(0xFF0A1931),
-        child: const Icon(Icons.add, size: 30),
-        onPressed: () => setState(() => _indiceSeleccionado = 1), // Lleva al buscador
+      floatingActionButton: _indiceSeleccionado == 0 ? Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // 🤖 NUEVO BOTÓN DE IA
+          FloatingActionButton.extended(
+            heroTag: "btnIA",
+            backgroundColor: const Color(0xFF0A1931), // Azul oscuro
+            foregroundColor: const Color(0xFFFFC107), // Dorado
+            icon: const Icon(Icons.auto_awesome),
+            label: const Text("IA", style: TextStyle(fontWeight: FontWeight.bold)),
+            onPressed: () => _mostrarRecomendacionesIA(context),
+          ),
+          const SizedBox(height: 15),
+          // ➕ TU BOTÓN ORIGINAL DE AGREGAR
+          FloatingActionButton(
+            heroTag: "btnAdd",
+            backgroundColor: const Color(0xFFFFC107),
+            foregroundColor: const Color(0xFF0A1931),
+            child: const Icon(Icons.add, size: 30),
+            onPressed: () => setState(() => _indiceSeleccionado = 1),
+          ),
+        ],
       ) : null,
     );
   }
@@ -666,6 +695,100 @@ class _PantallaEsperaTokenState extends State<PantallaEsperaToken> with TickerPr
             const SizedBox(width: 30, height: 30, child: CircularProgressIndicator(color: Color(0xFFFFC107), strokeWidth: 2)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// ✨ MODAL DE RECOMENDACIONES IA
+// ==========================================
+class ModalRecomendacionesIA extends StatefulWidget {
+  const ModalRecomendacionesIA({super.key});
+
+  @override
+  State<ModalRecomendacionesIA> createState() => _ModalRecomendacionesIAState();
+}
+
+class _ModalRecomendacionesIAState extends State<ModalRecomendacionesIA> {
+  bool _cargando = true;
+  List<Map<String, dynamic>> _recomendaciones = [];
+  final _apiService = ApiService();
+
+  @override
+  void initState() {
+    super.initState();
+    _pedirRecomendaciones();
+  }
+
+  Future<void> _pedirRecomendaciones() async {
+    // Llamamos al endpoint que creaste en api_service.dart
+    final recs = await _apiService.getRecomendacionesIA();
+    if (mounted) {
+      setState(() {
+        _recomendaciones = recs;
+        _cargando = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      height: MediaQuery.of(context).size.height * 0.6, // Ocupa el 60% de la pantalla
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.auto_awesome, color: Color(0xFFFFC107), size: 28),
+              SizedBox(width: 10),
+              Text("Descubrir con IA", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const Divider(color: Colors.white24, height: 30),
+          
+          // Lógica visual: Si está cargando muestra el spinner, sino la lista.
+          Expanded(
+            child: _cargando 
+              ? const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(color: Color(0xFFFFC107)),
+                      SizedBox(height: 15),
+                      Text("Analizando tus gustos...", style: TextStyle(color: Colors.white70)),
+                      Text("(Esto puede tardar unos segundos)", style: TextStyle(color: Colors.white30, fontSize: 12)),
+                    ],
+                  ),
+                )
+              : _recomendaciones.isEmpty
+                  ? const Center(child: Text("Hubo un error o necesitas agregar más series primero.", style: TextStyle(color: Colors.white70)))
+                  : ListView.builder(
+                      itemCount: _recomendaciones.length,
+                      itemBuilder: (context, index) {
+                        final rec = _recomendaciones[index];
+                        return Card(
+                          color: Colors.white.withOpacity(0.05),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          margin: const EdgeInsets.only(bottom: 15),
+                          child: Padding(
+                            padding: const EdgeInsets.all(15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(rec["titulo"] ?? "Sin título", style: const TextStyle(color: Color(0xFFFFC107), fontSize: 18, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 8),
+                                Text(rec["razon"] ?? "", style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.4)),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+          ),
+        ],
       ),
     );
   }

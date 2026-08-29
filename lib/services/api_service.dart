@@ -147,4 +147,32 @@ class ApiService {
       return false;
     }
   }
+
+  // ==========================================
+  // 🤖 RECOMENDACIONES DE INTELIGENCIA ARTIFICIAL
+  // ==========================================
+  Future<List<Map<String, dynamic>>> getRecomendacionesIA() async {
+    final url = await _getUrl('recomendaciones');
+    final headers = await _getHeaders();
+
+    try {
+      // Le damos un poco más de tiempo (90s) porque la IA puede tardar unos segundos en pensar
+      final response = await http.get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 90)); 
+
+      if (response.statusCode == 200) {
+        final String body = utf8.decode(response.bodyBytes);
+        final List<dynamic> data = jsonDecode(body);
+        
+        // Convertimos la respuesta en una lista que Flutter pueda usar fácilmente
+        return data.map((item) => {
+          "titulo": item["titulo"],
+          "razon": item["razon"]
+        }).toList();
+      }
+      return [];
+    } catch (e) {
+      return []; // Si falla, devolvemos una lista vacía
+    }
+  }
 }
